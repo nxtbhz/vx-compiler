@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
     if(argc != 2)
     {
-        die("Missing parameters. Usage: ./vox <filename>.vox");
+        die("Missing parameters. Usage: ./vx <filename>.vx");
     }    
     
     // printf("%s\n", argv[1]);
