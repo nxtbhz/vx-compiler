@@ -3,20 +3,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct source_t source_read(const char *path)
+struct source_t *source_read(const char *path)
 {
-    struct source_t res = {path, NULL, 0, SOURCE_OK};
+    struct source_t *res = malloc(sizeof(struct source_t));
+    if(res == NULL)
+    {
+        return NULL;
+    }
+
+    res->path = path;
+    res->content = NULL;
+    res->size = 0;
+    res->status = SOURCE_OK;
 
     if (path == NULL || path[0] == '\0')
     {
-        res.status = SOURCE_ARG_ERROR;
+        res->status = SOURCE_ARG_ERROR;
         return res;
     }
 
     FILE *fptr = fopen(path, "rb");
     if (fptr == NULL)
     {
-        res.status = SOURCE_OPEN_ERROR;
+        res->status = SOURCE_OPEN_ERROR;
         return res;
     }
 
@@ -25,7 +34,7 @@ struct source_t source_read(const char *path)
     if (buffer == NULL)
     {
         fclose(fptr);
-        res.status = SOURCE_MEM_ERROR;
+        res->status = SOURCE_MEM_ERROR;
         return res;
     }
 
@@ -38,7 +47,7 @@ struct source_t source_read(const char *path)
             {
                 free(buffer);
                 fclose(fptr);
-                res.status = SOURCE_MEM_ERROR;
+                res->status = SOURCE_MEM_ERROR;
                 return res;
             }
 
@@ -48,7 +57,7 @@ struct source_t source_read(const char *path)
             {
                 free(buffer);
                 fclose(fptr);
-                res.status = SOURCE_MEM_ERROR;
+                res->status = SOURCE_MEM_ERROR;
                 return res;
             }
             buffer = new_buffer;
@@ -65,7 +74,7 @@ struct source_t source_read(const char *path)
             {
                 free(buffer);
                 fclose(fptr);
-                res.status = SOURCE_READ_ERROR;
+                res->status = SOURCE_READ_ERROR;
                 return res;
             }
             break;
@@ -75,23 +84,23 @@ struct source_t source_read(const char *path)
     if (fclose(fptr) != 0)
     {
         free(buffer);
-        res.status = SOURCE_READ_ERROR;
+        res->status = SOURCE_READ_ERROR;
         return res;
     }
 
     if (memchr(buffer, '\0', size) != NULL)
     {
         free(buffer);
-        res.status = SOURCE_NULL_BYTE_ERROR;
+        res->status = SOURCE_NULL_BYTE_ERROR;
         return res;
     }
 
     buffer[size] = '\0';
 
-    res.path = path;
-    res.content = buffer;
-    res.status = SOURCE_OK;
-    res.size = size;
+    res->path = path;
+    res->content = buffer;
+    res->status = SOURCE_OK;
+    res->size = size;
     return res;
 }
 

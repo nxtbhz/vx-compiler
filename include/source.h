@@ -23,7 +23,7 @@ struct source_t
     enum source_read_status status;
 };
 
-struct source_t source_read(const char *path);
+struct source_t *source_read(const char *path);
 void source_free(struct source_t *src);
 const char *source_error(enum source_read_status);
 
